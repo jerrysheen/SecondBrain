@@ -14,9 +14,9 @@
       "icon": "redo-glyph"
     },
     {
-      "id": "editing-toolbar:toggle-format-brush",
-      "name": "Format Brush",
-      "icon": "paintbrush"
+      "id": "editing-toolbar:editor:toggle-checklist-status",
+      "name": "Checklist",
+      "icon": "checkbox-glyph"
     },
     {
       "id": "editing-toolbar:format-eraser",
@@ -190,11 +190,6 @@
       "icon": "bullet-list-glyph",
       "SubmenuCommands": [
         {
-          "id": "editing-toolbar:editor:toggle-checklist-status",
-          "name": "Checklist",
-          "icon": "checkbox-glyph"
-        },
-        {
           "id": "editing-toolbar:renumber-ordered-list",
           "name": "Renumber ordered list",
           "icon": "list-restart"
@@ -283,8 +278,8 @@
     },
     {
       "id": "editing-toolbar:toggle-format-brush",
-      "name": "Format Brush",
-      "icon": "paintbrush"
+      "name": "Checklist",
+      "icon": "check-square"
     },
     {
       "id": "editing-toolbar:format-eraser",
@@ -474,11 +469,6 @@
       "name": "submenu-list",
       "icon": "bullet-list-glyph",
       "SubmenuCommands": [
-        {
-          "id": "editing-toolbar:editor:toggle-checklist-status",
-          "name": "Checklist",
-          "icon": "checkbox-glyph"
-        },
         {
           "id": "editing-toolbar:renumber-ordered-list",
           "name": "Renumber ordered list",
