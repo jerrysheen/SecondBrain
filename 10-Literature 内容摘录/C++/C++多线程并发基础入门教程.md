@@ -169,48 +169,28 @@ void notifier() {
 }
 ```
 
-### 1. cv.wait()
+   1. 首先， 互斥锁可以被某个线程lock， 当被这个线程lock的时候， 别的线程用到这个互斥锁的就会因为解不开锁而卡住，lock表示这个线程持有这个锁。 lock时，则表示任何用到这个锁的线程会卡住。
+   2. condition variable.wait ， 就是选中一把锁，和一状态判定语句， 当状态判定为false的时候，这把锁就被lock，也就是本线程不持有这个锁，直接不执行后续代码。
+		当别的线程会发起notify_one或者notify_all，这样子cvwait的地方会判断状态为何，如果状态是true，那么就会去尝试unlock这个互斥锁， 如果成功了再回来判断一次状态是否还是true，如果是的话，就进行后续操作。
+这个地方我觉得我没有完全理解下面的这个逻辑，
+就是cv到底是干什么的，以及流程在什么情况下会被执行下去。
+如果cv后面的状态是false的话， 他就会把lk解锁， 也就是不持有这把锁了， 注意在unique_lock声明的时候，这个锁本身就是lock状态，也就是被这个线程持有。
+接着，fakse状态下，这个线程就会睡眠，直到被notify的时候，就回去尝试这个状态是否变成true了。变成true了之后，<font color="#ff0000">第一时间是去尝试抢锁，然后上锁。</font> 在抢到锁之后，则会再调用一次谓词，如果是false的话，就要继续睡，如果是true的话，就返回，这个返回就是指跳出cv这行， 此时lk一定是上锁的，
+也就是说执行后续逻辑的时候， 一定是上锁的
 ``` cpp
-std::unique_lock<std::mutex> lock(mtx); 
-cv.wait(lock, [] { return ready; }); // 等待ready为true，不是等待lock
-
-// 模拟wait()的内部逻辑
-void wait_simulation(std::unique_lock<std::mutex>& lock, auto condition) {
-    while (!condition()) {  // 1. 检查条件
-        lock.unlock();      // 2. 如果条件不满足，释放锁
-        // 3. 线程进入睡眠，等待被notify唤醒
-        wait_for_notification();
-        lock.lock();        // 4. 被唤醒后，重新获取锁
-        // 5. 回到while循环，再次检查条件
-    }
-    // 6. 条件满足，继续执行，锁保持锁定状态
-}
-
-
-
+std::unique_lock<std::mutex> lk(mtx);   // 进入临界区（先上锁）
+cv.wait(lk, [&]{ return ready; });
+/*
+含义：
+- 如果此刻 ready == true：不睡，直接返回；返回时 lk 仍“持锁”。
+- 如果此刻 ready == false：
+    1) 原子地：把 mtx 解锁 + 让线程睡眠到 cv 的等待队列
+    2) 被 notify 唤醒后，先去重新“抢回这把锁”（lock）
+    3) 抢到锁后，再次调用谓词：若仍 false，继续睡；若 true，返回
+- 无论是哪种路径，函数“返回时”一定是“持锁”的
+*/
+	
 ```
-这个地方的wait，是在wait ready为true，
-如果ready是false，就**解锁lock**，等待线程被唤醒。【让其他线程能够修改ready】
-类似于上面这个， condition为false的时候，就释放lock的控制权，等待ready 为true，
-``` c++
-void notifier() {
-    // 模拟一些工作
-    std::this_thread::sleep_for(std::chrono::seconds(2));
-    
-    std::cout << "Notifier is setting ready = true\n";
-    
-    // 修改条件
-    {
-        std::lock_guard<std::mutex> lock(mtx);
-        ready = true;
-    }
-    
-    // 通知等待的线程
-    std::cout << "Notifier is calling notify_all()\n";
-    cv.notify_all();  // 唤醒所有等待线程
-}
-```
-这个地方就很简单，把ready设置为true，<font color="#4bacc6"> 然后告诉所有线程进行一次同步？</font>cv.notify_one();  cv.notify_all();
 ### 2. unique_lock   cv.notify_one();  cv.notify_all();
 unique_lock 比 lock_guard更加灵活， 可以支持手动lock unlock，
 因为**wait内部需要去调用lock unlock**，所以用unique_lock

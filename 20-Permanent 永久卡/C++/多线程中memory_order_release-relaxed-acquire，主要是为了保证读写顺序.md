@@ -7,6 +7,9 @@ tags:
 # 命题：多线程中memory_order_release-relaxed-acquire，主要是为了保证读写顺序
 ## 定义 / 结论
 
+还有一个问题， 这三个一起用是怎么样的， release保证前面的一定执行，acquire呢
+release + acquire 和 release relaex，两个东西加起来会有啥区别呢？[[todo]]
+
 ### 1. 本线程的顺序保证
 **`release` 确保在它之前的所有操作都不会被重排序到它之后。**
 就像厨师的承诺："我说菜好了，那么切菜、炒菜、调味这些步骤肯定都已经完成了"

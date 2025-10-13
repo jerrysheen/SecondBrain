@@ -84,9 +84,9 @@ int main() {
 // Renderer.h
 #pragma once
 #include "SpscRing.h"
-#include <thread>
-#include <atomic>
-#include <iostream>
+	#include <thread>
+	#include <atomic>
+	#include <iostream>
 
 class Renderer {
 public:
