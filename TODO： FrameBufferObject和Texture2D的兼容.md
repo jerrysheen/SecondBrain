@@ -2,6 +2,9 @@
 这两个要兼容， 本质上其实抽象出来两个东西就ok
 一个是CPU端需要的， TextureDesc，也就是描述这个Texture的类型，长宽。
 一个是GPU需要的， TextureView， 也就是描述这个Texture的 srvdesc rtvdesc dsvdesc
+我之前的思想是一个隐式operator实现转化， 其实没必要。
+他们有共同点， 这个共同点不一定要抽象成父类， 也可以抽象成一个成员。
+
 - 想法：<一句话问题/灵感>
 - 背景/触发：<来源/上下文>
 - 下一步：- [ ] 转Literature / - [ ] 直接Permanent？

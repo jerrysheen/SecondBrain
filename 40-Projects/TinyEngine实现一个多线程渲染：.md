@@ -282,3 +282,20 @@ private:
 
 ```
 
+# RenderLoop中的解码，薄解码：
+```cpp
+                case Op::kEndFrame: {
+                    // Close / ExecuteCommandLists / Present / Signal fence
+                    // queue->ExecuteCommandLists(...);
+                    // swapchain->Present(...);
+                    // fence->Signal(frameFenceValue++);
+                    // Flush when necessary
+                } break;
+                
+            
+```
+这个地方我们怎么拆：
+RenderAPI::SetRenderTarget(colorattchment , depthattachemtent, clearvalue);
+还是传递一个结构体？
+传递一个结构体更好， 传递一个结构体相当于也加了一层抽象封装。
+这样隐藏了数据细节， 如果我们后续需要修改这个 结构本身， 只需要修改数据，不需要将接口实现全部实现一遍。
